@@ -1,64 +1,62 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+## Issue 42654
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+https://github.com/laravel/framework/issues/42654
 
-## About Laravel
+Issue #42654 reports Laravel 9.15.0 and 9.16.0 are truncating JSON responses. 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Which I could not reproduce on both versions 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This repo was built as a start point  so the complainers could show how to reproduce it.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Issue #42654 references this stackoverflow link:
 
-## Learning Laravel
+https://stackoverflow.com/questions/72476635/laravel-json-response-is-missing-right-square-bracket-and-ajax-throws-parseerror
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+And when commentator also mentioned telescope JSON would fail as well
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+https://github.com/laravel/framework/issues/42654#issuecomment-1146701757
 
-## Laravel Sponsors
+## Notes
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+This repo:
 
-### Premium Partners
+- Was built with this command `laravel new issue-42654`
+- Changed these files:
+  - `.env.example`
+    - As no confidential information is provided, configuration used in local `.env`
+      was replicated for ease reproducing the repo
+  - `README.md`
+    - These instructions
+  - `./database/seeders/DatabaseSeeder.php`
+      - Uncommented seeder line to create users
+  - `./resources/views/welcome.blade.php`
+      - Changed code to use a jQuery's AJAX request similar to the one on the linked StackOverflow post
+  - `./routes/api.php`
+    - Added a route (`./api/test`) which returns all User records
+  - `composer.json`, `composer.lock`, `./config/app.php`, `./config/telescope.php`, and `./public/vendor/telescope/*`
+    - All these files were changed due to installing Telescope
+  - `./app/Providers/TelescopeServiceProvider.php`
+    - Although installed by Telescope, the gate method was changed to allow public access
+- Default installation was committed in the first commit
+- Changes were committed in the second commit
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Installation
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Clone this repo
+   - `git clone git@github.com:rodrigopedra/issue-42654.git`
+2. Change to project directory
+    - `cd issue-42654`
+3. Copy the `.env.example` to `.env`
+    - `cp .env.example .env`
+4. Create the SQLite database file
+    - `touch ./database/database.sqlite`
+5. Run composer migrations
+    - `composer install`
+6. Migrate and seed database
+    - `php artisan migrate --seed`
+7. Serve application
+    - `php artisan serve`
+8. Visit Homepage
+    - http://localhost:8000/
+9. Visit Telescope Dashboard
+    - http://localhost:8000/telescope/requests
